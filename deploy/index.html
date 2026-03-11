@@ -264,12 +264,11 @@
             height: 480px;
         }
 
-        .europe-map {
+        .europe-svg {
             position: absolute;
             inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 100%;
+            height: 100%;
         }
 
         .network-dot {
@@ -295,17 +294,28 @@
             100% { transform: scale(2.5); opacity: 0; }
         }
 
-        .network-dot.berlin { top: 35%; left: 52%; width: 16px; height: 16px; }
-        .network-dot.london { top: 38%; left: 32%; animation-delay: 0.3s; }
-        .network-dot.paris { top: 48%; left: 38%; animation-delay: 0.6s; }
-        .network-dot.madrid { top: 65%; left: 30%; animation-delay: 0.9s; }
-        .network-dot.rome { top: 58%; left: 52%; animation-delay: 1.2s; }
-        .network-dot.amsterdam { top: 35%; left: 40%; animation-delay: 0.4s; }
-        .network-dot.warsaw { top: 35%; left: 62%; animation-delay: 0.7s; }
-        .network-dot.stockholm { top: 20%; left: 52%; animation-delay: 1s; }
-        .network-dot.vienna { top: 42%; left: 56%; animation-delay: 0.5s; }
-        .network-dot.zurich { top: 47%; left: 46%; animation-delay: 0.8s; }
-        .network-dot.prague { top: 38%; left: 55%; animation-delay: 1.1s; }
+        /* City positions based on real geographic coordinates */
+        /* Projection: lon -12..32 → x 0..100%, lat 35..72 → y 100..0% */
+        .network-dot.berlin    { top: 52.7%; left: 57.7%; width: 16px; height: 16px; z-index: 2; }
+        .network-dot.london    { top: 55.4%; left: 27.0%; animation-delay: 0.3s; }
+        .network-dot.paris     { top: 62.4%; left: 32.5%; animation-delay: 0.6s; }
+        .network-dot.madrid    { top: 85.4%; left: 18.9%; animation-delay: 0.9s; }
+        .network-dot.rome      { top: 81.4%; left: 55.7%; animation-delay: 1.2s; }
+        .network-dot.amsterdam { top: 53.0%; left: 38.4%; animation-delay: 0.4s; }
+        .network-dot.warsaw    { top: 53.5%; left: 75.0%; animation-delay: 0.7s; }
+        .network-dot.stockholm { top: 34.3%; left: 68.4%; animation-delay: 1s; }
+        .network-dot.vienna    { top: 64.3%; left: 64.5%; animation-delay: 0.5s; }
+        .network-dot.zurich    { top: 66.5%; left: 46.6%; animation-delay: 0.8s; }
+        .network-dot.prague    { top: 59.2%; left: 60.0%; animation-delay: 1.1s; }
+        .network-dot.copenhagen { top: 44.1%; left: 55.9%; animation-delay: 0.2s; }
+        .network-dot.dublin    { top: 50.5%; left: 13.0%; animation-delay: 0.75s; }
+        .network-dot.lisbon    { top: 90.0%; left: 6.6%; animation-delay: 1.3s; }
+        .network-dot.oslo      { top: 32.7%; left: 51.8%; animation-delay: 0.85s; }
+        .network-dot.helsinki   { top: 31.9%; left: 83.9%; animation-delay: 1.15s; }
+        .network-dot.brussels  { top: 57.3%; left: 37.3%; animation-delay: 0.45s; }
+        .network-dot.budapest  { top: 66.2%; left: 70.5%; animation-delay: 0.65s; }
+        .network-dot.milan     { top: 71.6%; left: 48.2%; animation-delay: 0.95s; }
+        .network-dot.barcelona { top: 82.7%; left: 32.3%; animation-delay: 1.05s; }
 
         .network-dot .label {
             position: absolute;
@@ -329,34 +339,14 @@
 
         .network-dot:hover .label { opacity: 1; }
 
-        /* Connection lines */
-        .network-lines {
-            position: absolute;
-            inset: 0;
-            z-index: -1;
+        /* Connection lines animate in */
+        .connection-lines line {
+            stroke-dashoffset: 100;
+            animation: drawLine 2s ease forwards;
         }
 
-        .network-lines svg {
-            width: 100%;
-            height: 100%;
-        }
-
-        .network-lines line {
-            stroke: rgba(205,234,104,0.12);
-            stroke-width: 1;
-        }
-
-        /* Europe outline (simplified) */
-        .europe-outline {
-            position: absolute;
-            inset: 0;
-            z-index: -2;
-            opacity: 0.06;
-        }
-
-        .europe-outline svg {
-            width: 100%;
-            height: 100%;
+        @keyframes drawLine {
+            to { stroke-dashoffset: 0; }
         }
 
         /* ========== STATS BAR ========== */
@@ -948,21 +938,84 @@
                 </div>
             </div>
             <div class="hero-visual">
-                <div class="network-lines">
-                    <svg viewBox="0 0 500 480">
-                        <!-- Lines from Berlin to other cities -->
-                        <line x1="260" y1="168" x2="160" y2="182" opacity="0.4"/>
-                        <line x1="260" y1="168" x2="190" y2="230" opacity="0.3"/>
-                        <line x1="260" y1="168" x2="150" y2="312" opacity="0.2"/>
-                        <line x1="260" y1="168" x2="260" y2="278" opacity="0.3"/>
-                        <line x1="260" y1="168" x2="200" y2="168" opacity="0.4"/>
-                        <line x1="260" y1="168" x2="310" y2="168" opacity="0.4"/>
-                        <line x1="260" y1="168" x2="260" y2="96" opacity="0.3"/>
-                        <line x1="260" y1="168" x2="280" y2="202" opacity="0.5"/>
-                        <line x1="260" y1="168" x2="230" y2="226" opacity="0.4"/>
-                        <line x1="260" y1="168" x2="275" y2="182" opacity="0.5"/>
-                    </svg>
-                </div>
+                <!-- Europe SVG Map with grid + outline + connection lines -->
+                <svg class="europe-svg" viewBox="0 0 500 480" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Grid dots background -->
+                    <defs>
+                        <pattern id="grid" x="0" y="0" width="25" height="25" patternUnits="userSpaceOnUse">
+                            <circle cx="12.5" cy="12.5" r="1" fill="rgba(205,234,104,0.06)"/>
+                        </pattern>
+                    </defs>
+                    <rect width="500" height="480" fill="url(#grid)"/>
+
+                    <!-- Simplified Europe outline -->
+                    <path d="
+                        M33,432 L50,440 L95,440 L130,420 L155,395 L162,370 L160,350 L130,340
+                        L100,355 L80,370 L60,355 L55,320 L65,290 L75,270 L60,255 L70,245
+                        L95,260 L120,268 L140,272 L160,265 L175,258 L192,252
+                        L210,248 L230,240 L255,232 L270,225 L280,212 L275,195 L265,185
+                        L258,160 L270,140 L285,120 L300,100 L320,80 L342,70 L360,75
+                        L370,90 L365,110 L355,130 L342,165
+                        L360,170 L380,160 L400,150 L420,153
+                        L410,175 L395,190 L380,200
+                        L375,215 L378,235 L375,257
+                        L365,270 L350,280 L340,300 L345,320 L355,340
+                        L345,355 L330,365 L315,370 L300,365 L288,355
+                        L280,340 L270,355 L260,375 L268,390 L280,400
+                        L270,415 L255,425 L245,440
+                    " stroke="rgba(205,234,104,0.15)" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+
+                    <!-- UK & Ireland -->
+                    <path d="
+                        M55,240 L60,225 L70,215 L85,210 L95,220 L100,235
+                        L110,242 L120,235 L130,225 L140,220 L148,228
+                        L145,240 L138,255 L130,262 L120,265 L105,262
+                        L90,258 L75,252 L62,248 Z
+                    " stroke="rgba(205,234,104,0.12)" stroke-width="1.2" fill="none"/>
+                    <path d="
+                        M40,230 L50,220 L60,225 L55,240 L45,242 Z
+                    " stroke="rgba(205,234,104,0.10)" stroke-width="1.2" fill="none"/>
+
+                    <!-- Italy boot -->
+                    <path d="
+                        M240,340 L250,350 L255,365 L260,375 L268,390 L280,400
+                        L275,410 L265,405 L258,395 L250,385 L245,370 L240,355 Z
+                    " stroke="rgba(205,234,104,0.12)" stroke-width="1.2" fill="none"/>
+                    <!-- Sicily -->
+                    <path d="M260,410 L275,415 L280,420 L270,422 Z" stroke="rgba(205,234,104,0.08)" stroke-width="1" fill="none"/>
+
+                    <!-- Scandinavia detail -->
+                    <path d="
+                        M258,160 L260,140 L270,120 L280,100 L295,85 L310,75
+                        L325,70 L342,70 L355,78 L362,90 L358,110
+                        L350,135 L342,165 L335,180 L325,190
+                    " stroke="rgba(205,234,104,0.13)" stroke-width="1.2" fill="none"/>
+
+                    <!-- Connection lines from Berlin (289, 253) to all cities -->
+                    <g class="connection-lines" opacity="0.8">
+                        <line x1="289" y1="253" x2="135" y2="266" stroke="rgba(205,234,104,0.10)" stroke-width="0.8" stroke-dasharray="4 4"/>
+                        <line x1="289" y1="253" x2="163" y2="300" stroke="rgba(205,234,104,0.10)" stroke-width="0.8" stroke-dasharray="4 4"/>
+                        <line x1="289" y1="253" x2="94" y2="410" stroke="rgba(205,234,104,0.06)" stroke-width="0.8" stroke-dasharray="4 4"/>
+                        <line x1="289" y1="253" x2="278" y2="391" stroke="rgba(205,234,104,0.08)" stroke-width="0.8" stroke-dasharray="4 4"/>
+                        <line x1="289" y1="253" x2="192" y2="254" stroke="rgba(205,234,104,0.12)" stroke-width="0.8" stroke-dasharray="4 4"/>
+                        <line x1="289" y1="253" x2="375" y2="257" stroke="rgba(205,234,104,0.12)" stroke-width="0.8" stroke-dasharray="4 4"/>
+                        <line x1="289" y1="253" x2="342" y2="165" stroke="rgba(205,234,104,0.10)" stroke-width="0.8" stroke-dasharray="4 4"/>
+                        <line x1="289" y1="253" x2="323" y2="309" stroke="rgba(205,234,104,0.12)" stroke-width="0.8" stroke-dasharray="4 4"/>
+                        <line x1="289" y1="253" x2="233" y2="319" stroke="rgba(205,234,104,0.10)" stroke-width="0.8" stroke-dasharray="4 4"/>
+                        <line x1="289" y1="253" x2="300" y2="284" stroke="rgba(205,234,104,0.14)" stroke-width="0.8" stroke-dasharray="4 4"/>
+                        <line x1="289" y1="253" x2="280" y2="212" stroke="rgba(205,234,104,0.12)" stroke-width="0.8" stroke-dasharray="4 4"/>
+                        <line x1="289" y1="253" x2="65" y2="242" stroke="rgba(205,234,104,0.06)" stroke-width="0.8" stroke-dasharray="4 4"/>
+                        <line x1="289" y1="253" x2="33" y2="432" stroke="rgba(205,234,104,0.04)" stroke-width="0.8" stroke-dasharray="4 4"/>
+                        <line x1="289" y1="253" x2="259" y2="157" stroke="rgba(205,234,104,0.10)" stroke-width="0.8" stroke-dasharray="4 4"/>
+                        <line x1="289" y1="253" x2="420" y2="153" stroke="rgba(205,234,104,0.08)" stroke-width="0.8" stroke-dasharray="4 4"/>
+                        <line x1="289" y1="253" x2="187" y2="275" stroke="rgba(205,234,104,0.10)" stroke-width="0.8" stroke-dasharray="4 4"/>
+                        <line x1="289" y1="253" x2="353" y2="318" stroke="rgba(205,234,104,0.10)" stroke-width="0.8" stroke-dasharray="4 4"/>
+                        <line x1="289" y1="253" x2="241" y2="344" stroke="rgba(205,234,104,0.08)" stroke-width="0.8" stroke-dasharray="4 4"/>
+                        <line x1="289" y1="253" x2="162" y2="397" stroke="rgba(205,234,104,0.06)" stroke-width="0.8" stroke-dasharray="4 4"/>
+                    </g>
+                </svg>
+
+                <!-- City dots overlaid on map -->
                 <div class="network-dot berlin"><span class="label">Berlin HQ</span></div>
                 <div class="network-dot london"><span class="label">London</span></div>
                 <div class="network-dot paris"><span class="label">Paris</span></div>
@@ -974,6 +1027,15 @@
                 <div class="network-dot vienna"><span class="label">Vienna</span></div>
                 <div class="network-dot zurich"><span class="label">Zurich</span></div>
                 <div class="network-dot prague"><span class="label">Prague</span></div>
+                <div class="network-dot copenhagen"><span class="label">Copenhagen</span></div>
+                <div class="network-dot dublin"><span class="label">Dublin</span></div>
+                <div class="network-dot lisbon"><span class="label">Lisbon</span></div>
+                <div class="network-dot oslo"><span class="label">Oslo</span></div>
+                <div class="network-dot helsinki"><span class="label">Helsinki</span></div>
+                <div class="network-dot brussels"><span class="label">Brussels</span></div>
+                <div class="network-dot budapest"><span class="label">Budapest</span></div>
+                <div class="network-dot milan"><span class="label">Milan</span></div>
+                <div class="network-dot barcelona"><span class="label">Barcelona</span></div>
             </div>
         </div>
     </section>
