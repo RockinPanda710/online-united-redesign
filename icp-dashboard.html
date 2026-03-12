@@ -306,7 +306,15 @@
         @media (prefers-reduced-motion: reduce) {
             * { transition: none !important; animation: none !important; }
         }
-    </style>
+    
+/* Logo responsive (Design System) */
+.logo-img { height: 96px; width: auto; }
+.footer-logo-img { height: 40px; width: auto; }
+@media (max-width: 768px) {
+    .logo-img { height: 56px; }
+    .footer-logo-img { height: 32px; }
+}
+</style>
 </head>
 <body>
 
@@ -326,7 +334,7 @@
     <header class="header">
         <div class="header-left">
             <div class="logo">
-                <img src="logo-silabs.png" alt="Sales Intelligence Labs" style="height: 36px; width: auto;">
+                <img src="logo-silabs.png" alt="Sales Intelligence Labs" class="logo-img">
             </div>
             <div class="project-badge">Typ A Outbound — Potenzialeinschätzung</div>
             <h1 class="project-title">ICP: <span class="gradient-text">Online United</span></h1>
@@ -779,7 +787,7 @@
     <!-- ═══ FOOTER ═══ -->
     <footer class="footer">
         <div class="footer-logo">
-            <img src="logo-silabs.png" alt="Sales Intelligence Labs" style="height: 36px; width: auto;">
+            <img src="logo-silabs.png" alt="Sales Intelligence Labs" class="logo-img">
         </div>
         <div class="footer-date">Erstellt am 11.03.2026 — Typ A Outbound Pipeline</div>
     </footer>
