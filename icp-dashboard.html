@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICP & Potenzialeinschätzung — Online United</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-bg: #ffffff;
+            --color-bg-elevated: #f5f5f5;
+            --color-text: #1a1a1a;
+            --color-text-muted: #555555;
+            --color-text-subtle: #999999;
+            --color-border: rgba(0,0,0,0.08);
+            --color-accent: #0EA5E9;
+            --color-accent-hover: #0284C7;
+            --color-accent-subtle: rgba(14,165,233,0.08);
+            --color-indigo: #6366F1;
+            --color-indigo-subtle: rgba(99,102,241,0.08);
+            --gradient-brand: linear-gradient(135deg, #0EA5E9, #6366F1);
+            --color-success: #10B981;
+            --color-success-subtle: rgba(16,185,129,0.10);
+            --color-warning: #F59E0B;
+            --color-warning-subtle: rgba(245,158,11,0.10);
+            --color-error: #EF4444;
+            --font-heading: 'Space Grotesk', -apple-system, sans-serif;
+            --font-body: 'Inter', -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-body);
+            background: linear-gradient(135deg, #f0f7ff 0%, #f5f0ff 100%);
+            color: var(--color-text);
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: fixed; inset: 0; z-index: -2; pointer-events: none;
+            background:
+                radial-gradient(ellipse 60% 50% at 20% 20%, rgba(14,165,233,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 40% at 80% 30%, rgba(99,102,241,0.06) 0%, transparent 50%);
+        }
+        body::after {
+            content: '';
+            position: fixed; inset: 0; z-index: -1; pointer-events: none;
+            background-image:
+                linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 30%, transparent 70%);
+            -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 30%, transparent 70%);
+        }
+
+        /* SVG Gradient Definition */
+        .svg-defs { position: absolute; width: 0; height: 0; }
+
+        .dashboard { max-width: 1400px; margin: 0 auto; padding: 32px 40px 80px; position: relative; z-index: 1; }
+
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; flex-wrap: wrap; gap: 16px; }
+        .header-left { flex: 1; min-width: 300px; }
+        .logo { font-family: var(--font-heading); font-size: 18px; font-weight: 700; letter-spacing: -0.02em; color: var(--color-text); display: flex; align-items: center; gap: 6px; margin-bottom: 20px; }
+        .logo-accent { background: var(--color-accent); color: #fff; padding: 0.1em 0.35em; font-size: 0.85em; }
+        .project-badge { font-family: var(--font-mono); font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-accent); margin-bottom: 10px; }
+        .project-title { font-family: var(--font-heading); font-size: clamp(28px, 4vw, 44px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 8px; }
+        .gradient-text { background: var(--gradient-brand); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .project-sub { font-size: 15px; color: var(--color-text-muted); line-height: 1.6; max-width: 680px; }
+        .header-meta { text-align: right; font-family: var(--font-mono); font-size: 12px; color: var(--color-text-subtle); }
+
+        /* Info Box */
+        .info-box {
+            background: rgba(14,165,233,0.06);
+            border: 1px solid rgba(14,165,233,0.18);
+            border-radius: 12px;
+            padding: 20px 28px;
+            margin-bottom: 48px;
+            font-size: 15px;
+            line-height: 1.7;
+            color: var(--color-text-muted);
+        }
+        .info-box strong { color: var(--color-text); }
+
+        /* Section */
+        .section { margin-bottom: 56px; }
+        .section-label { font-family: var(--font-mono); font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-accent); margin-bottom: 10px; position: relative; padding-bottom: 12px; }
+        .section-label::after { content: ''; position: absolute; bottom: 0; left: 0; width: 60px; height: 2px; background: linear-gradient(90deg, var(--color-accent), var(--color-indigo), transparent); opacity: 0.4; transition: width 0.5s var(--ease-out-expo); }
+        .section-label:hover::after { width: 120px; }
+        h2 { font-family: var(--font-heading); font-size: clamp(20px, 2.5vw, 28px); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 20px; }
+
+        /* Stats Row */
+        .stats-row { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 48px; }
+        .stat-card {
+            background: rgba(255,255,255,0.55);
+            backdrop-filter: blur(24px) saturate(1.3);
+            -webkit-backdrop-filter: blur(24px) saturate(1.3);
+            border: 1px solid rgba(255,255,255,0.70);
+            border-radius: 16px;
+            padding: 20px 24px;
+            text-align: center;
+            min-width: 160px;
+            flex: 1;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.8);
+            transition: all 0.5s var(--ease-out-expo);
+        }
+        .stat-card:hover { transform: translateY(-8px) scale(1.02); border-color: rgba(14,165,233,0.3); box-shadow: 0 4px 8px rgba(0,0,0,0.04), 0 16px 40px rgba(14,165,233,0.16), 0 28px 64px rgba(99,102,241,0.08), inset 0 1px 0 rgba(255,255,255,1); }
+        .stat-number { font-family: var(--font-mono); font-size: 32px; font-weight: 700; background: var(--gradient-brand); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.1; }
+        .stat-number.green { background: none; -webkit-text-fill-color: var(--color-success); }
+        .stat-label { font-size: 11px; color: var(--color-text-muted); margin-top: 6px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+        .stat-sub { font-size: 12px; color: var(--color-text-subtle); margin-top: 4px; }
+
+        /* Glass card */
+        .glass-card {
+            background: rgba(255,255,255,0.55);
+            backdrop-filter: blur(24px) saturate(1.3);
+            -webkit-backdrop-filter: blur(24px) saturate(1.3);
+            border: 1px solid rgba(255,255,255,0.70);
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,0.8);
+            transition: transform 0.5s var(--ease-out-expo), box-shadow 0.5s ease, border-color 0.5s ease, background 0.5s ease;
+        }
+        .glass-card:hover {
+            background: rgba(255,255,255,0.75);
+            border-color: rgba(14,165,233,0.3);
+            transform: translateY(-6px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.04), 0 16px 40px rgba(14,165,233,0.16), 0 28px 64px rgba(99,102,241,0.08), inset 0 1px 0 rgba(255,255,255,1);
+        }
+
+        /* Dimension Grid */
+        .dimension-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 16px; }
+        .dimension-card { padding: 28px; }
+        .dimension-header { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+        .dimension-number { font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--color-accent); }
+        .dimension-title { font-family: var(--font-heading); font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
+
+        /* Icon Ring */
+        .icon-ring {
+            position: relative; display: flex; align-items: center; justify-content: center;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(12px) saturate(1.2);
+            -webkit-backdrop-filter: blur(12px) saturate(1.2);
+            box-shadow: 0 2px 8px rgba(14,165,233,0.08), 0 1px 2px rgba(0,0,0,0.04);
+            transition: box-shadow 0.4s ease, transform 0.4s ease;
+            flex-shrink: 0;
+            width: 44px; height: 44px;
+        }
+        .icon-ring:hover, *:hover > .icon-ring {
+            box-shadow: 0 8px 24px rgba(14,165,233,0.15), 0 2px 6px rgba(0,0,0,0.06);
+            transform: translateY(-2px);
+        }
+        .icon-ring svg {
+            width: 22px; height: 22px;
+            position: relative; z-index: 1;
+            stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; fill: none;
+            transition: transform 0.4s var(--ease-out-expo);
+        }
+        .icon-ring:hover svg, *:hover > .icon-ring svg { transform: scale(1.08); }
+
+        /* Dimension content */
+        .dim-content { font-size: 14px; line-height: 1.7; color: var(--color-text-muted); }
+        .dim-content strong { color: var(--color-text); font-weight: 600; }
+        .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+        .tag {
+            font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+            padding: 4px 10px; border-radius: 6px;
+            background: var(--color-accent-subtle);
+            color: var(--color-accent-hover);
+            letter-spacing: 0.02em;
+        }
+        .tag.exclude {
+            background: rgba(239,68,68,0.08);
+            color: var(--color-error);
+        }
+        .tag.green {
+            background: var(--color-success-subtle);
+            color: #059669;
+        }
+        .tag.warn {
+            background: var(--color-warning-subtle);
+            color: #D97706;
+        }
+        .dim-sub { font-size: 12px; color: var(--color-text-subtle); margin-top: 6px; font-style: italic; }
+
+        /* Pain Points Table */
+        .pain-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 12px; }
+        .pain-card { padding: 20px 24px; }
+        .pain-label { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-accent); margin-bottom: 6px; }
+        .pain-title { font-family: var(--font-heading); font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+        .pain-detail { font-size: 13px; color: var(--color-text-muted); line-height: 1.6; }
+        .pain-detail span { display: block; margin-bottom: 4px; }
+        .pain-detail .label-inline { font-weight: 600; color: var(--color-text); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
+
+        /* Scoring Table */
+        .scoring-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .scoring-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 13px;
+            background: rgba(255,255,255,0.55);
+            backdrop-filter: blur(24px) saturate(1.3);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.70);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03);
+        }
+        .scoring-table thead th {
+            background: rgba(14,165,233,0.06);
+            font-family: var(--font-heading);
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: -0.01em;
+            padding: 14px 18px;
+            text-align: left;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            white-space: nowrap;
+        }
+        .scoring-table thead th:first-child { border-radius: 16px 0 0 0; }
+        .scoring-table thead th:last-child { border-radius: 0 16px 0 0; }
+        .scoring-table tbody td {
+            padding: 12px 18px;
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+            vertical-align: top;
+            line-height: 1.5;
+        }
+        .scoring-table tbody tr:last-child td { border-bottom: none; }
+        .scoring-table tbody tr:hover td { background: rgba(14,165,233,0.03); }
+        .score-a { color: var(--color-success); font-weight: 600; }
+        .score-b { color: var(--color-warning); font-weight: 600; }
+        .score-c { color: var(--color-text-subtle); font-weight: 600; }
+
+        /* Hook Section */
+        .hook-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 12px; }
+        .hook-card { padding: 20px 24px; }
+        .hook-check { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+        .hook-check svg { width: 18px; height: 18px; flex-shrink: 0; margin-top: 2px; stroke: var(--color-success); stroke-width: 2; fill: none; }
+        .hook-check span { font-size: 14px; color: var(--color-text-muted); line-height: 1.5; }
+
+        /* Search Strategy */
+        .search-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr)); gap: 16px; }
+        .search-card { padding: 24px; }
+        .search-title { font-family: var(--font-heading); font-size: 15px; font-weight: 600; margin-bottom: 12px; }
+        .search-filters { list-style: none; }
+        .search-filters li {
+            font-family: var(--font-mono); font-size: 12px; color: var(--color-text-muted);
+            padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,0.04);
+            display: flex; gap: 8px;
+        }
+        .search-filters li:last-child { border-bottom: none; }
+        .filter-key { color: var(--color-accent); font-weight: 500; min-width: 110px; flex-shrink: 0; }
+        .filter-val { color: var(--color-text); }
+
+        /* Open Questions */
+        .questions-list { list-style: none; counter-reset: q; }
+        .questions-list li {
+            counter-increment: q;
+            display: flex; align-items: flex-start; gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            font-size: 14px; color: var(--color-text-muted); line-height: 1.6;
+        }
+        .questions-list li:last-child { border-bottom: none; }
+        .questions-list li::before {
+            content: counter(q);
+            font-family: var(--font-mono); font-size: 13px; font-weight: 700;
+            background: var(--gradient-brand); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            min-width: 24px; text-align: center; flex-shrink: 0; padding-top: 1px;
+        }
+
+        /* Trigger list */
+        .trigger-list { list-style: none; }
+        .trigger-list li { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; font-size: 14px; color: var(--color-text-muted); line-height: 1.5; }
+        .trigger-list li::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--gradient-brand); flex-shrink: 0; margin-top: 7px; }
+        .trigger-list.secondary li::before { background: var(--color-text-subtle); }
+
+        /* Footer */
+        .footer {
+            text-align: center; padding: 32px 0 0;
+            border-top: 1px solid rgba(0,0,0,0.06);
+            margin-top: 24px;
+        }
+        .footer-logo { font-family: var(--font-heading); font-size: 15px; font-weight: 700; color: var(--color-text-subtle); display: flex; align-items: center; justify-content: center; gap: 5px; margin-bottom: 6px; }
+        .footer-logo .logo-accent { font-size: 0.85em; }
+        .footer-date { font-family: var(--font-mono); font-size: 11px; color: var(--color-text-subtle); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard { padding: 20px 16px 60px; }
+            .header { flex-direction: column; }
+            .header-meta { text-align: left; }
+            .stats-row { gap: 8px; }
+            .stat-card { min-width: 120px; padding: 14px 16px; }
+            .stat-number { font-size: 24px; }
+            .dimension-grid { grid-template-columns: 1fr; }
+            .scoring-table { font-size: 12px; }
+            .scoring-table thead th, .scoring-table tbody td { padding: 10px 12px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- SVG Gradient Definition -->
+<svg class="svg-defs" aria-hidden="true">
+    <defs>
+        <linearGradient id="icon-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#0EA5E9"/>
+            <stop offset="100%" stop-color="#6366F1"/>
+        </linearGradient>
+    </defs>
+</svg>
+
+<div class="dashboard">
+
+    <!-- ═══ HEADER ═══ -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <span>Sales Intelligence</span><span class="logo-accent">Labs</span>
+            </div>
+            <div class="project-badge">Typ A Outbound — Potenzialeinschätzung</div>
+            <h1 class="project-title">ICP: <span class="gradient-text">Online United</span></h1>
+            <p class="project-sub">Affiliate Programme Management für Europa. Online United hilft Unternehmen, Partnerprogramme über europäische Märkte zu skalieren. Dieses Dashboard definiert den idealen Kunden und schätzt das adressierbare Marktpotenzial ein.</p>
+        </div>
+        <div class="header-meta">
+            <div>Stand: 11.03.2026</div>
+            <div>Version 1.0</div>
+            <div>Status: Entwurf</div>
+        </div>
+    </header>
+
+    <!-- ═══ EXECUTIVE SUMMARY ═══ -->
+    <div class="info-box">
+        <strong>Zusammenfassung:</strong> Online United's ideale Kunden sind Unternehmen mit 50 bis 500 Mitarbeitern aus den Bereichen E-Commerce, Travel, Finance, SaaS und D2C, die Affiliate Programme aufbauen, skalieren oder nach Europa expandieren wollen. Der adressierbare Markt in DACH, UK und den Niederlanden umfasst rund <strong>25.000 Unternehmen</strong>. Davon sind geschätzt 8.000 bis 11.000 als A oder B Leads qualifizierbar. Der primäre Outreach Kanal ist LinkedIn, die Nachrichten laufen auf Deutsch (DACH) und Englisch (UK, NL).
+    </div>
+
+    <!-- ═══ POTENZIALZAHLEN ═══ -->
+    <div class="section">
+        <div class="section-label">Marktpotenzial</div>
+        <h2>Adressierbarer Markt (Apollo Data)</h2>
+    </div>
+
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-number">16.881</div>
+            <div class="stat-label">E-Commerce & D2C</div>
+            <div class="stat-sub">DACH + UK + NL, 51–500 MA</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">10.682</div>
+            <div class="stat-label">Travel & Finance</div>
+            <div class="stat-sub">DACH + UK + NL, 51–500 MA</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">3.558</div>
+            <div class="stat-label">SaaS & Subscription</div>
+            <div class="stat-sub">DACH + UK + NL, 51–500 MA</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">~25.000</div>
+            <div class="stat-label">Gesamt (bereinigt)</div>
+            <div class="stat-sub">Abzgl. Overlap zwischen Vertikalen</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number green">8–11k</div>
+            <div class="stat-label">Qualifizierte Leads</div>
+            <div class="stat-sub">Geschätzt 30–40% A/B Quote</div>
+        </div>
+    </div>
+
+    <!-- ═══ 8 ICP DIMENSIONEN ═══ -->
+    <div class="section">
+        <div class="section-label">Ideal Customer Profile</div>
+        <h2>Die 8 ICP Dimensionen</h2>
+    </div>
+
+    <div class="dimension-grid">
+
+        <!-- DIM 1: Branche -->
+        <div class="glass-card dimension-card">
+            <div class="dimension-header">
+                <div class="icon-ring">
+                    <svg viewBox="0 0 24 24" stroke="url(#icon-gradient)">
+                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="dimension-number">01</div>
+                    <div class="dimension-title">Branche</div>
+                </div>
+            </div>
+            <div class="dim-content">
+                <strong>5 Primäre Vertikale:</strong>
+                <div class="tag-row">
+                    <span class="tag">E-Commerce</span>
+                    <span class="tag">Travel & Hospitality</span>
+                    <span class="tag">Finance & Insurance</span>
+                    <span class="tag">SaaS / Subscription</span>
+                    <span class="tag">D2C Brands</span>
+                </div>
+                <strong>Sub-Nischen mit Priorität:</strong> Fashion, Beauty, Home & Garden, Neobanks, InsurTech, Abo-Boxen, Meal Kits, Online Travel Agencies
+                <div class="tag-row" style="margin-top: 10px;">
+                    <span class="tag exclude">Pure B2B</span>
+                    <span class="tag exclude">Affiliate Netzwerke</span>
+                    <span class="tag exclude">Pharma</span>
+                    <span class="tag exclude">Glücksspiel</span>
+                    <span class="tag exclude">Behörden</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- DIM 2: Unternehmensgröße -->
+        <div class="glass-card dimension-card">
+            <div class="dimension-header">
+                <div class="icon-ring">
+                    <svg viewBox="0 0 24 24" stroke="url(#icon-gradient)">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="dimension-number">02</div>
+                    <div class="dimension-title">Unternehmensgröße</div>
+                </div>
+            </div>
+            <div class="dim-content">
+                <div class="tag-row">
+                    <span class="tag green">Sweet Spot: 50–500 MA</span>
+                    <span class="tag warn">Range: 20–2.000 MA</span>
+                </div>
+                <strong>Revenue:</strong> EUR 10–100 Mio. Umsatz<br><br>
+                <strong>Begründung:</strong> Unter 50 MA fehlt typischerweise das Budget für einen Agency Retainer (EUR 2.000–10.000/Monat). Über 500 MA haben Unternehmen oft ein eigenes Affiliate Team. Ausnahme: Große Firmen bei Expansion in neue europäische Märkte.
+            </div>
+        </div>
+
+        <!-- DIM 3: Entscheider -->
+        <div class="glass-card dimension-card">
+            <div class="dimension-header">
+                <div class="icon-ring">
+                    <svg viewBox="0 0 24 24" stroke="url(#icon-gradient)">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="dimension-number">03</div>
+                    <div class="dimension-title">Entscheider</div>
+                </div>
+            </div>
+            <div class="dim-content">
+                <strong>Primäre Titel (Budget-Autorität):</strong>
+                <div class="tag-row">
+                    <span class="tag">Head of Partnerships</span>
+                    <span class="tag">Head of Performance Marketing</span>
+                    <span class="tag">VP Marketing</span>
+                    <span class="tag">CMO</span>
+                    <span class="tag">Head of Growth</span>
+                    <span class="tag">Head of E-Commerce</span>
+                </div>
+                <strong>Sekundär:</strong> Digital Marketing Manager, Channel Manager<br>
+                <strong>Seniority:</strong> Minimum Head of / Director. Manager Level nur bei Firmen unter 100 MA.
+                <div class="dim-sub">Abteilung: Marketing (70%), Growth (15%), Partnerships (15%)</div>
+            </div>
+        </div>
+
+        <!-- DIM 4: Geografie -->
+        <div class="glass-card dimension-card">
+            <div class="dimension-header">
+                <div class="icon-ring">
+                    <svg viewBox="0 0 24 24" stroke="url(#icon-gradient)">
+                        <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="dimension-number">04</div>
+                    <div class="dimension-title">Geografie</div>
+                </div>
+            </div>
+            <div class="dim-content">
+                <strong>Tier 1 (erste Kampagne):</strong>
+                <div class="tag-row">
+                    <span class="tag green">Deutschland</span>
+                    <span class="tag green">UK</span>
+                    <span class="tag green">Niederlande</span>
+                    <span class="tag green">Österreich</span>
+                    <span class="tag green">Schweiz</span>
+                </div>
+                <strong>Tier 2:</strong> Frankreich, Nordics, Spanien, Italien<br>
+                <strong>Tier 3:</strong> Polen, Tschechien, Belgien, Irland, Portugal<br><br>
+                <strong>Sprache:</strong> DACH = Deutsch, Rest = Englisch
+                <div class="dim-sub">Besonders spannend: DACH Firmen die nach Süd/Ost/Nordeuropa expandieren, UK Firmen die nach dem Brexit europäische Partner brauchen</div>
+            </div>
+        </div>
+
+        <!-- DIM 5: Timing-Trigger -->
+        <div class="glass-card dimension-card">
+            <div class="dimension-header">
+                <div class="icon-ring">
+                    <svg viewBox="0 0 24 24" stroke="url(#icon-gradient)">
+                        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="dimension-number">05</div>
+                    <div class="dimension-title">Timing-Trigger</div>
+                </div>
+            </div>
+            <div class="dim-content">
+                <strong>Primary (starke Kaufsignale):</strong>
+                <ul class="trigger-list">
+                    <li>Stellenanzeige für Affiliate oder Partnership Rollen</li>
+                    <li>Marktexpansion in neue europäische Länder</li>
+                    <li>Kürzliche Funding Runde (Series A/B/C)</li>
+                    <li>Neuer CMO oder VP Marketing (letzte 6 Monate)</li>
+                    <li>Bestehendes Affiliate Programm sichtbar vernachlässigt</li>
+                </ul>
+                <strong>Secondary (weichere Signale):</strong>
+                <ul class="trigger-list secondary">
+                    <li>E-Commerce Plattform Migration</li>
+                    <li>Wettbewerber mit starkem Affiliate Programm</li>
+                    <li>Teilnahme an PI LIVE, Affiliate Summit, Dmexco</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- DIM 7: Ausschluss -->
+        <div class="glass-card dimension-card">
+            <div class="dimension-header">
+                <div class="icon-ring">
+                    <svg viewBox="0 0 24 24" stroke="url(#icon-gradient)">
+                        <circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="dimension-number">07</div>
+                    <div class="dimension-title">Ausschlusskriterien</div>
+                </div>
+            </div>
+            <div class="dim-content">
+                <div class="tag-row">
+                    <span class="tag exclude">Unter 20 MA</span>
+                    <span class="tag exclude">Unter EUR 2 Mio. Umsatz</span>
+                    <span class="tag exclude">Über 5.000 MA mit In-House Team</span>
+                </div>
+                <strong>Industrie:</strong> Pure B2B ohne Consumer Transaktionen, Affiliate Netzwerke selbst<br>
+                <strong>Wettbewerber:</strong> Acceleration Partners, Optimus PM, Gen3 Marketing, Growthack<br>
+                <strong>Geografie:</strong> Unternehmen ohne europäischen Markt oder Expansionspläne<br>
+                <strong>Deal-Breaker:</strong> Langfristige Agenturverträge (Restlaufzeit über 12 Monate)
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ═══ DIM 6: PAIN POINTS ═══ -->
+    <div class="section" style="margin-top: 48px;">
+        <div class="section-label">Dimension 06</div>
+        <h2>Pain Points & Bedarf</h2>
+    </div>
+
+    <div class="pain-grid">
+        <div class="glass-card pain-card">
+            <div class="pain-label">Pain 01</div>
+            <div class="pain-title">Programm wächst nicht</div>
+            <div class="pain-detail">
+                <span><span class="label-inline">Status Quo:</span> Gleiche 20 Publisher seit 2 Jahren, keine aktive Rekrutierung</span>
+                <span><span class="label-inline">Sichtbar:</span> Wenige Publisher im Netzwerk Verzeichnis, veraltete Werbemittel</span>
+            </div>
+        </div>
+        <div class="glass-card pain-card">
+            <div class="pain-label">Pain 02</div>
+            <div class="pain-title">Niemand hat Zeit für Affiliate</div>
+            <div class="pain-detail">
+                <span><span class="label-inline">Status Quo:</span> Marketing Manager macht Affiliate nebenbei, wird immer deprioritisiert</span>
+                <span><span class="label-inline">Sichtbar:</span> Job Posting nennt Affiliate als 1 von 8 Aufgaben</span>
+            </div>
+        </div>
+        <div class="glass-card pain-card">
+            <div class="pain-label">Pain 03</div>
+            <div class="pain-title">Expansion scheitert an Kontakten</div>
+            <div class="pain-detail">
+                <span><span class="label-inline">Status Quo:</span> Programm läuft nur im Heimatmarkt, keine lokalen Publisher in Zielmärkten</span>
+                <span><span class="label-inline">Sichtbar:</span> Affiliate Seite nur auf Deutsch, Programm nur in DACH Region gelistet</span>
+            </div>
+        </div>
+        <div class="glass-card pain-card">
+            <div class="pain-label">Pain 04</div>
+            <div class="pain-title">Kein Programm vorhanden</div>
+            <div class="pain-detail">
+                <span><span class="label-inline">Status Quo:</span> Nur Paid Ads (Google, Meta), kein performancebasierter Kanal</span>
+                <span><span class="label-inline">Sichtbar:</span> Keine Affiliate Seite, kein Tracking Pixel im Quellcode</span>
+            </div>
+        </div>
+        <div class="glass-card pain-card">
+            <div class="pain-label">Pain 05</div>
+            <div class="pain-title">Aktuelle Agentur liefert nicht</div>
+            <div class="pain-detail">
+                <span><span class="label-inline">Status Quo:</span> Generalist Agentur bietet Affiliate als eines von vielen Services</span>
+                <span><span class="label-inline">Sichtbar:</span> Stagnierende Programm Metriken trotz Agenturvertrag</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ DIM 8: HOOK-STRATEGIE ═══ -->
+    <div class="section" style="margin-top: 48px;">
+        <div class="section-label">Dimension 08</div>
+        <h2>Hook-Strategie: Affiliate Programme Audit</h2>
+    </div>
+
+    <div class="info-box">
+        <strong>Empfehlung:</strong> Ein neues automatisiertes Modul ("Affiliate Programme Audit"), das von außen prüft, ob und wie ein Unternehmen Affiliate Marketing betreibt. Die Ergebnisse liefern konkrete, belegbare Hooks für die Outreach Nachrichten. Fallback: <code style="font-family: var(--font-mono); font-size: 13px; background: rgba(0,0,0,0.06); padding: 2px 6px; border-radius: 4px;">techstack_audit.py</code> erkennt bereits einige Affiliate Technologien.
+    </div>
+
+    <div class="hook-grid">
+        <div class="glass-card hook-card">
+            <div class="hook-check">
+                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                <span><strong>Affiliate Seite vorhanden?</strong><br>Footer Links crawlen nach /affiliate, /partner, /partnerprogramm</span>
+            </div>
+            <div class="hook-check">
+                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                <span><strong>Tracking Technologie?</strong><br>Awin MasterTag, Impact Pixel, Refersion, TUNE im Quellcode</span>
+            </div>
+            <div class="hook-check">
+                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                <span><strong>Netzwerk Listing?</strong><br>Programm bei Awin, Tradedoubler oder CJ Affiliate gelistet?</span>
+            </div>
+        </div>
+        <div class="glass-card hook-card">
+            <div class="hook-check">
+                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                <span><strong>Internationale Abdeckung?</strong><br>Hreflang auf Affiliate Seite, Programm in mehreren Sprachen?</span>
+            </div>
+            <div class="hook-check">
+                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                <span><strong>Seiten-Qualität?</strong><br>Provisions Details, Marketing Materialien, Publisher Testimonials vorhanden?</span>
+            </div>
+            <div class="hook-check">
+                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                <span><strong>Wettbewerber Vergleich?</strong><br>Haben direkte Konkurrenten stärkere Affiliate Programme?</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ LEAD SCORING ═══ -->
+    <div class="section" style="margin-top: 48px;">
+        <div class="section-label">Qualifizierung</div>
+        <h2>Lead Scoring Matrix</h2>
+    </div>
+
+    <div class="scoring-wrapper">
+        <table class="scoring-table">
+            <thead>
+                <tr>
+                    <th>Kriterium</th>
+                    <th><span class="score-a">A-Lead</span> (Ideal)</th>
+                    <th><span class="score-b">B-Lead</span> (Gut)</th>
+                    <th><span class="score-c">C-Lead</span> (Möglich)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Branche</strong></td>
+                    <td>E-Commerce, Travel, Finance</td>
+                    <td>SaaS, D2C, Subscription</td>
+                    <td>Angrenzende Industrien</td>
+                </tr>
+                <tr>
+                    <td><strong>Größe</strong></td>
+                    <td>100–500 MA, EUR 20–100M</td>
+                    <td>50–99 oder 501–1.000 MA</td>
+                    <td>20–49 oder 1.001–2.000 MA</td>
+                </tr>
+                <tr>
+                    <td><strong>Entscheider</strong></td>
+                    <td>Head of Partnerships / Performance Marketing</td>
+                    <td>Marketing Director, Head of Growth</td>
+                    <td>Manager Level</td>
+                </tr>
+                <tr>
+                    <td><strong>Geografie</strong></td>
+                    <td>DACH + UK + NL (Tier 1)</td>
+                    <td>Frankreich, Nordics (Tier 2)</td>
+                    <td>Tier 3 Märkte</td>
+                </tr>
+                <tr>
+                    <td><strong>Timing</strong></td>
+                    <td>Hiring Affiliate Rollen ODER Funding ODER Expansion</td>
+                    <td>Neuer CMO/VP in letzten 6 Monaten</td>
+                    <td>Kein sichtbarer Trigger</td>
+                </tr>
+                <tr>
+                    <td><strong>Affiliate Status</strong></td>
+                    <td>Programm vorhanden aber vernachlässigt ODER keins, aber Wettbewerber hat</td>
+                    <td>Aktives Programm, aber nur 1 Markt</td>
+                    <td>Programm aktiv und gemanaged</td>
+                </tr>
+                <tr>
+                    <td><strong>Pain sichtbar</strong></td>
+                    <td>Veraltete Affiliate Seite, Job Posting = Nebenaufgabe</td>
+                    <td>Generisches Marketing Job Posting</td>
+                    <td>Keine sichtbaren Indikatoren</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <p style="font-size: 13px; color: var(--color-text-subtle); margin-top: 12px;">
+        <strong>Scoring Logik:</strong> A-Lead = 4+ A-Kriterien (volle Personalisierung). B-Lead = Mix aus A und B (Standard Outreach). C-Lead = Überwiegend C (parken, nur bei Gelegenheit).
+    </p>
+
+    <!-- ═══ SUCHSTRATEGIE ═══ -->
+    <div class="section" style="margin-top: 48px;">
+        <div class="section-label">Operativ</div>
+        <h2>Apollo / LinkedIn Suchstrategie</h2>
+    </div>
+
+    <div class="search-grid">
+        <div class="glass-card search-card">
+            <div class="search-title">Search 1: E-Commerce & D2C</div>
+            <ul class="search-filters">
+                <li><span class="filter-key">Locations</span><span class="filter-val">DE, UK, NL, AT, CH</span></li>
+                <li><span class="filter-key">Employees</span><span class="filter-val">51–200, 201–500</span></li>
+                <li><span class="filter-key">Keywords</span><span class="filter-val">e-commerce, online retail, D2C, direct to consumer</span></li>
+                <li><span class="filter-key">Ergebnis</span><span class="filter-val" style="font-weight: 700; color: var(--color-accent);">16.881 Treffer</span></li>
+            </ul>
+        </div>
+        <div class="glass-card search-card">
+            <div class="search-title">Search 2: Travel & Finance</div>
+            <ul class="search-filters">
+                <li><span class="filter-key">Locations</span><span class="filter-val">DE, UK, NL, AT, CH</span></li>
+                <li><span class="filter-key">Employees</span><span class="filter-val">51–200, 201–500</span></li>
+                <li><span class="filter-key">Keywords</span><span class="filter-val">travel, hospitality, fintech, insurance, insurtech</span></li>
+                <li><span class="filter-key">Ergebnis</span><span class="filter-val" style="font-weight: 700; color: var(--color-accent);">10.682 Treffer</span></li>
+            </ul>
+        </div>
+        <div class="glass-card search-card">
+            <div class="search-title">Search 3: SaaS & Subscription</div>
+            <ul class="search-filters">
+                <li><span class="filter-key">Locations</span><span class="filter-val">DE, UK, NL, AT, CH</span></li>
+                <li><span class="filter-key">Employees</span><span class="filter-val">51–200, 201–500</span></li>
+                <li><span class="filter-key">Keywords</span><span class="filter-val">SaaS, subscription, software as a service</span></li>
+                <li><span class="filter-key">Ergebnis</span><span class="filter-val" style="font-weight: 700; color: var(--color-accent);">3.558 Treffer</span></li>
+            </ul>
+        </div>
+        <div class="glass-card search-card">
+            <div class="search-title">People Search (pro Firma)</div>
+            <ul class="search-filters">
+                <li><span class="filter-key">Titles</span><span class="filter-val">Head of Partnerships, Head of Performance Marketing, VP Marketing, CMO, Head of Growth, Head of E-Commerce</span></li>
+                <li><span class="filter-key">Seniority</span><span class="filter-val">Director, VP, C-Suite, Manager</span></li>
+                <li><span class="filter-key">Enrichment</span><span class="filter-val">People Enrichment (1 Credit/Kontakt)</span></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ═══ OFFENE PUNKTE ═══ -->
+    <div class="section" style="margin-top: 48px;">
+        <div class="section-label">Nächste Schritte</div>
+        <h2>Offene Punkte für Abstimmung mit Online United</h2>
+    </div>
+
+    <div class="glass-card" style="padding: 28px 32px;">
+        <ul class="questions-list">
+            <li>In welchen Branchen hat Online United bereits Erfahrung oder Cases? (Verschiebt die Branche auf Tier 1)</li>
+            <li>Welche europäischen Märkte deckt das Team aktuell personell ab? (Bestimmt Tier 1 Geografie)</li>
+            <li>Was ist der Preisrange für Management und Consulting? (Bestimmt den Firmengrößen Filter)</li>
+            <li>Wer sendet die Outreach Nachrichten? Rene oder ein Online United Teammitglied?</li>
+            <li>Booking Link für die Kalender Terminierung?</li>
+            <li>Gibt es direkte Wettbewerber die explizit ausgeschlossen werden müssen?</li>
+        </ul>
+    </div>
+
+    <!-- ═══ FOOTER ═══ -->
+    <footer class="footer">
+        <div class="footer-logo">
+            <span>Sales Intelligence</span><span class="logo-accent">Labs</span>
+        </div>
+        <div class="footer-date">Erstellt am 11.03.2026 — Typ A Outbound Pipeline</div>
+    </footer>
+
+</div>
+
+</body>
+</html>
